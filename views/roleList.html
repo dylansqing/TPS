@@ -1,0 +1,146 @@
+<!--
+ * @Author: shuang.qing
+ * @Date: 2020-07-31 15:50:47
+ * @LastEditTime: 2020-08-03 09:33:19
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \ThirdPartServer\views\roleList.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <title>角色管理</title>
+</head>
+
+<body>
+    <div id="app">
+        <el-card :body-style="{ padding: '0px' }">
+            <div slot="header">
+                <span>
+                    <center>
+                        <h1>{{title}}</h1>
+                    </center>
+                </span>
+            </div>
+            <!-- card body -->
+            <el-table :data="roleData" v-if="roleData" border stripe :row-style="{height:'20px'}">
+                <el-table-column prop="name" label="角色名" width="auto">
+                </el-table-column>
+                <el-table-column prop="state" label="启用状态" width="auto">
+                    <template slot-scope="scope">
+                        <el-tag size="medium" v-if="scope.row.state" type="success">启用
+                        </el-tag>
+                        <el-tag size="medium" v-if="!scope.row.state" type="warning">禁用
+                        </el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="isAdmin" label="管理员权限" width="auto">
+                    <template slot-scope="scope">
+                        <el-tag size="medium" v-if="scope.row.isAdmin" type="danger">管理员
+                        </el-tag>
+                        <el-tag size="medium" v-if="!scope.row.isAdmin">普通用户</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="limits" label="权限" width="auto" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span v-for="(e,i) in scope.row.limits" key="i">
+                            <el-tag size="medium" type="info">{{e}}</el-tag>
+                        </span>
+                    </template>
+                </el-table-column>
+                <el-table-column fixed="right" label="操作" width="100">
+                    <template slot-scope="scope">
+                        <el-button @click="handleClick(scope.row)" type="text" size="small">编辑</el-button>
+                        <el-button @click="deleteClick(scope.row)" type="text" size="small">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-card>
+        <center>
+            <el-pagination @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="PageSize" layout="total, prev, pager, next" :total="totalCount">
+            </el-pagination>
+        </center>
+    </div>
+</body>
+
+<script>
+    let vm = new Vue({
+        el: "#app",
+        data() {
+            return {
+                title: "角色列表",
+                BaseUrl: "http://127.0.0.1:3000",
+                roleData: new Array(),
+                // 默认显示第几页
+                currentPage: 1,
+                // 总条数，根据接口获取数据长度(注意：这里不能为空)
+                totalCount: 1,
+                // 默认每页显示的条数（可修改）
+                PageSize: 10,
+            }
+        },
+        methods: {
+            async fetch() {
+                let e = await axios.get(`${this.BaseUrl}/role/lists/${this.currentPage}`)
+                this.roleData = e.data.roleInfo
+                this.totalCount = e.data.roleLength
+            },
+            handleClick(e) {
+                window.location.href = `${this.BaseUrl}/pic/roleedit/:${e._id}`
+            },
+            deleteClick(e) {
+                this.$confirm('此操作将永久删除角色信息, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(async() => {
+                    let res = await axios.delete(`${this.BaseUrl}/role/delete/${e._id}`)
+                    if (res.statusText == 'OK') {
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                        this.fetch()
+                    }
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
+            async handleCurrentChange(val) {
+                let e = await axios.get(`${this.BaseUrl}/role/lists/${val}`)
+                this.roleData = e.data.roleInfo
+                this.totalCount = e.data.roleLength
+                console.log(e)
+            }
+        },
+        beforeMount() {},
+        mounted() {
+            this.fetch()
+        },
+    })
+</script>
+
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "WenQuanYi Micro Hei", "Microsoft Yahei", sans-serif;
+    }
+    
+    .el-pagination {
+        position: relative;
+    }
+</style>
+
+</html>

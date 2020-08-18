@@ -1,0 +1,84 @@
+<!--
+ * @Author: your name
+ * @Date: 2020-08-03 10:30:57
+ * @LastEditTime: 2020-08-05 10:48:51
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: \ThirdPartServer\views\map.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Access-Control-Allow-Origin" content="*" />
+    <!-- <script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script> -->
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=dNkB9KryKayiE7zG7u8srTyM"></script>
+    <script src="http://api.map.baidu.com/library/GeoUtils/1.2/src/GeoUtils.js"></script>
+    <script src="http://api.map.baidu.com/library/InfoBox/1.2/src/InfoBox_min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script> -->
+    <title>MapCenter</title>
+</head>
+
+<body>
+    <div id="app">
+        <div id="allMap">
+            <!--地图-->
+        </div>
+    </div>
+</body>
+
+<script>
+    const vm = new Vue({
+        el: "#app",
+        data() {
+            return {
+                BaseUrl: "http://127.0.0.1:3000",
+            }
+        },
+        methods: {
+            MapInit() {
+                let map = new BMap.Map("allMap", {
+                    enableMapClick: false,
+                    minZoom: 7,
+                    maxZoom: 18,
+                });
+                map.setMapStyle({
+                    features: ["road", "building", "water", "land"],
+                    style: "midnight"
+                });
+                let point = new BMap.Point(114.07, 30.67); //成都市中心点
+                map.centerAndZoom(point, 7);
+                map.enableScrollWheelZoom(true);
+
+                return map
+            }
+        },
+        mounted() {
+            console.log('1')
+            this.MapInit()
+        },
+    })
+</script>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    
+    #allMap {
+        width: 100%;
+        height: 100vh;
+    }
+</style>
+
+<script>
+</script>
+
+</html>

@@ -1,0 +1,108 @@
+<!--
+ * @Author: shuang.qing
+ * @Date: 2020-08-03 17:52:47
+ * @LastEditTime: 2020-08-05 13:27:14
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \ThirdPartServer\views\userCenter.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <title>用户中心</title>
+</head>
+
+<body>
+    <div id="app">
+        <el-container>
+            <el-header>
+                <el-menu mode="horizontal" :default-active="0" @select="getSelectMenu">
+                    <el-submenu index="0" key="0">
+                        <template slot="title">用户管理</template>
+                        <el-menu-item index="0">
+                            用户列表
+                        </el-menu-item>
+                        <el-menu-item index="1">
+                            添加用户
+                        </el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="1" key="1">
+                        <template slot="title">角色管理</template>
+                        <el-menu-item index="2">
+                            角色列表
+                        </el-menu-item>
+                        <el-menu-item index="3">
+                            添加角色
+                        </el-menu-item>
+                    </el-submenu>
+                </el-menu>
+            </el-header>
+            <el-main>
+                <iframe :src="pageSrc" frameborder="0" style="width: 100%; height:780px"></iframe>
+            </el-main>
+        </el-container>
+    </div>
+</body>
+
+<script>
+    let vm = new Vue({
+        el: "#app",
+        data() {
+            return {
+                BaseUrl: "http://127.0.0.1:3000",
+                total: 0,
+                pageSrc: ""
+            }
+        },
+        methods: {
+            getRoleCount() {
+
+            },
+            getSelectMenu(e) {
+                switch (e) {
+                    case '0':
+                        this.pageSrc = `${this.BaseUrl}/pic/userlist`;
+                        break;
+                    case '1':
+                        this.pageSrc = `${this.BaseUrl}/pic/useredit`;
+                        break;
+                    case '2':
+                        this.pageSrc = `${this.BaseUrl}/pic/rolelist`;
+                        break;
+                    case '3':
+                        this.pageSrc = `${this.BaseUrl}/pic/roleedit`;
+                        break;
+                }
+            },
+            getInitPageSrc() {
+                this.pageSrc = `${this.BaseUrl}/pic/userlist`
+            }
+        },
+        mounted() {
+            this.getInitPageSrc()
+        },
+    })
+</script>
+
+<style>
+    * {
+        margin: 0;
+    }
+    
+    .el-main {
+        border: 1px dashed palegreen;
+    }
+    
+    .el-menu {
+        width: 100%;
+    }
+</style>
+
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <title>角色管理</title>
+</head>
+
+<body>
+    <div id="app">
+        <el-card :body-style="{ padding: '0px'}">
+            <div slot="header">
+                <center><span>
+                        <h1>{{id?"编辑角色":"新建角色"}}</h1>
+                    </span></center>
+            </div>
+            <el-row gutter="20">
+                <el-col :span="4">角色名称</el-col>
+                <el-col :span="20">
+                    <el-input v-model="roleInfo.name" placeholder="Please Input a Role Name" style="width: 20rem;" :disabled="id?true:false">
+                    </el-input>
+                </el-col>
+            </el-row>
+            <el-row gutter="20">
+                <el-col :span="4">角色状态</el-col>
+                <el-col :span="8">
+                    <el-switch v-model="roleInfo.state" active-color="#13ce66" inactive-color="#ff4949">
+                    </el-switch>
+                </el-col>
+                <el-col :span="4">管理员级别</el-col>
+                <el-col :span="8">
+                    <el-switch v-model="roleInfo.isAdmin" active-color="#13ce66" inactive-color="#ff4949">
+                    </el-switch>
+                </el-col>
+            </el-row>
+            <el-row gutter="20">
+                <el-col :span="4">功能权限设定</el-col>
+                <el-col :span="20">
+                    <el-transfer v-model="roleInfo.limits" :data="data" :titles="['可选功能项', '已选功能项']" :button-texts="['取消', '添加']">
+                    </el-transfer>
+                </el-col>
+            </el-row>
+
+            <el-row>
+                <el-col :span="12">
+                    <el-button type="success" @click="confirm">{{id?"修改":"添加"}}</el-button>
+                </el-col>
+                <el-col :span="12">
+                    <el-button type="danger" @click="goback">取消</el-button>
+                </el-col>
+            </el-row>
+        </el-card>
+    </div>
+</body>
+
+<script>
+    const vm = new Vue({
+        el: "#app",
+        data() {
+            return {
+                BaseUrl: "http://127.0.0.1:3000",
+                roleInfo: {
+                    name: "",
+                    state: false,
+                    isAdmin: false,
+                    limits: []
+                },
+                id: undefined,
+                data: [],
+            }
+        },
+        methods: {
+            generateData() {
+                const data = [];
+                for (let i = 1; i <= 15; i++) {
+                    data.push({
+                        key: i,
+                        label: `功能项 ${i}`,
+                        disabled: i % 4 === 0
+                    });
+                }
+                return data;
+            },
+            async confirm() {
+                let inp = this.roleInfo.name
+                if (inp.length <= 3 || inp.length >= 8) {
+                    this.$message({
+                        type: 'warning',
+                        message: '角色名输入不满足要求'
+                    });
+                    return
+                }
+
+                if (this.id) {
+                    let e = await axios.put(`${this.BaseUrl}/role/modify`, {
+                        id: this.id,
+                        data: this.roleInfo
+                    })
+                    if (e.status == 201) {
+                        this.$message({
+                            type: 'danger',
+                            message: '角色名已存在'
+                        });
+                    } else if (e.status == 200) {
+                        this.$message({
+                            type: 'success',
+                            message: '修改成功'
+                        });
+                        window.location.href = `${this.BaseUrl}/pic/rolelist`
+                    } else {
+                        this.$message({
+                            type: 'error',
+                            message: 'error'
+                        });
+                    }
+                } else {
+                    let e = await axios.post(`${this.BaseUrl}/role/add`, this.roleInfo)
+                    if (e.status == 201) {
+                        this.$message({
+                            type: 'danger',
+                            message: '角色名已存在'
+                        });
+                    } else if (e.status == 200) {
+                        this.$message({
+                            type: 'success',
+                            message: '新建角色成功'
+                        });
+                        //window.location.href = `${this.BaseUrl}/pic/rolelist`
+                        this.goback()
+                    } else {
+                        this.$message({
+                            type: 'error',
+                            message: 'error'
+                        });
+                    }
+                }
+            },
+            goback() {
+                window.location.href = `${this.BaseUrl}/pic/rolelist`
+            },
+            async isEdit() {
+                let t = window.location.href
+                let r = t.split(':')
+                if (r.length == 4) {
+                    this.id = r.slice(-1)[0]
+                    let e = await axios.get(`${this.BaseUrl}/role/list/${this.id}`)
+                    this.roleInfo = e.data
+                }
+            }
+        },
+        mounted() {
+            this.data = this.generateData()
+            this.isEdit()
+        },
+    })
+</script>
+
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "WenQuanYi Micro Hei", "Microsoft Yahei", sans-serif;
+    }
+    
+    .el-card {
+        width: 800px;
+    }
+    
+    #app {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .el-row {
+        margin: 20px 0px;
+        padding: 0px 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .el-row .el-col {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 800;
+        line-height: 3rem;
+    }
+</style>
+
+</html>

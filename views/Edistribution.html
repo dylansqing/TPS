@@ -1,0 +1,444 @@
+<!--
+ * @Author: shuang.qing
+ * @Date: 2020-08-10 10:04:05
+ * @LastEditTime: 2020-08-10 10:16:50
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \ThirdPartServer\views\Edistribution.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- <script src="../public//javascripts/echarts-wordcloud.min.js"></script> -->
+    <script src="/public/javascripts/echarts.min.js"></script>
+    <script src="/public/javascripts/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="/public/javascripts/china.js"></script>
+    <title>Distribution</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        background: RGBA(0, 0, 0, 0);
+        border: none;
+    }
+
+    body {
+        margin: 0;
+        background: RGBA(0, 0, 0, 0);
+    }
+
+    #app {
+        background: RGBA(0, 0, 0, 0);
+    }
+
+    .charts {
+        width: 100%;
+        height: 100vh;
+        background: transparent;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <div class="charts" id="chartOne"></div>
+    </div>
+</body>
+
+<script>
+    let vm = new Vue({
+        el: "#app",
+        data() {
+            return {
+                BaseUrl: "http://127.0.0.1:3000",
+                geoInfo: [
+                    { "name": "贵阳", "log": "106.71", "lat": "26.57" },
+                    { "name": "六盘水", "log": "104.82", "lat": "26.58" },
+                    { "name": "水城", "log": "104.82", "lat": "26.58" },
+                    { "name": "盘县", "log": "104.64", "lat": "25.81" },
+                    { "name": "六枝", "log": "105.47", "lat": "26.21" },
+                    { "name": "遵义", "log": "106.9", "lat": "27.7" },
+                    { "name": "绥阳", "log": "107.19", "lat": "27.95" },
+                    { "name": "道真", "log": "107.6", "lat": "28.89" },
+                    { "name": "凤冈", "log": "107.72", "lat": "27.97" },
+                    { "name": "余庆", "log": "107.88", "lat": "27.22" },
+                    { "name": "赤水", "log": "105.69", "lat": "28.57" },
+                    { "name": "桐梓", "log": "106.8", "lat": "28.16" },
+                    { "name": "正安", "log": "107.43", "lat": "28.56" },
+                    { "name": "务川", "log": "107.87", "lat": "28.54" },
+                    { "name": "湄潭", "log": "107.5", "lat": "27.76" },
+                    { "name": "仁怀", "log": "106.41", "lat": "27.81" },
+                    { "name": "习水", "log": "106.2", "lat": "28.33" },
+                    { "name": "铜仁", "log": "109.21", "lat": "27.73" },
+                    { "name": "玉屏", "log": "108.91", "lat": "27.24" },
+                    { "name": "思南", "log": "108.23", "lat": "27.94" },
+                    { "name": "德江", "log": "108.13", "lat": "28.27" },
+                    { "name": "万山", "log": "109.2", "lat": "27.52" },
+                    { "name": "江口", "log": "108.82", "lat": "27.68" },
+                    { "name": "师阡", "log": "108.24", "lat": "27.52" },
+                    { "name": "印江", "log": "108.41", "lat": "28.02" },
+                    { "name": "沿河", "log": "108.48", "lat": "28.57" },
+                    { "name": "松桃", "log": "109.18", "lat": "28.17" },
+                    { "name": "毕节", "log": "105.29", "lat": "27.32" },
+                    { "name": "黔西", "log": "106.04", "lat": "27.03" },
+                    { "name": "织金", "log": "105.76", "lat": "26.66" },
+                    { "name": "赫章", "log": "104.71", "lat": "27.13" },
+                    { "name": "大方", "log": "105.61", "lat": "27.16" },
+                    { "name": "金沙", "log": "106.22", "lat": "27.46" },
+                    { "name": "钠雍", "log": "105.38", "lat": "26.77" },
+                    { "name": "威宁", "log": "104.28", "lat": "26.87" },
+                    { "name": "安顺", "log": "105.92", "lat": "26.25" },
+                    { "name": "息烽", "log": "106.73", "lat": "27.1" },
+                    { "name": "清镇", "log": "106.46", "lat": "26.56" },
+                    { "name": "普定", "log": "105.75", "lat": "26.32" },
+                    { "name": "开阳", "log": "106.95", "lat": "27.06" },
+                    { "name": "修文", "log": "106.59", "lat": "26.84" },
+                    { "name": "平坝", "log": "106.26", "lat": "26.42" },
+                    { "name": "镇宁", "log": "105.75", "lat": "26.08" },
+                    { "name": "紫云", "log": "106.06", "lat": "25.75" },
+                    { "name": "关岭", "log": "105.62", "lat": "25.94" },
+                    { "name": "兴义", "log": "104.91", "lat": "25.1" },
+                    { "name": "普安", "log": "104.96", "lat": "25.79" },
+                    { "name": "贞丰", "log": "105.63", "lat": "25.39" },
+                    { "name": "望谟", "log": "106.09", "lat": "25.17" },
+                    { "name": "册亭", "log": "105.79", "lat": "25" },
+                    { "name": "安龙", "log": "105.49", "lat": "25.11" },
+                    { "name": "兴仁", "log": "105.18", "lat": "25.44" },
+                    { "name": "晴龙", "log": "105.21", "lat": "25.83" },
+                    { "name": "凯里", "log": "107.97", "lat": "26.59" },
+                    { "name": "施秉", "log": "108.11", "lat": "27.03" },
+                    { "name": "镇远", "log": "108.41", "lat": "27.06" },
+                    { "name": "天柱", "log": "109.2", "lat": "26.89" },
+                    { "name": "剑河", "log": "108.58", "lat": "26.64" },
+                    { "name": "黎平", "log": "109.14", "lat": "26.24" },
+                    { "name": "从江", "log": "108.9", "lat": "25.76" },
+                    { "name": "麻江", "log": "107.58", "lat": "26.49" },
+                    { "name": "黄平", "log": "107.89", "lat": "26.89" },
+                    { "name": "三穗", "log": "108.68", "lat": "26.98" },
+                    { "name": "岑巩", "log": "108.72", "lat": "27.21" },
+                    { "name": "锦屏", "log": "109.18", "lat": "26.7" },
+                    { "name": "台江", "log": "108.32", "lat": "26.68" },
+                    { "name": "榕江", "log": "108.5", "lat": "25.94" },
+                    { "name": "雷山", "log": "108.07", "lat": "26.38" },
+                    { "name": "丹寨", "log": "107.79", "lat": "26.21" },
+                    { "name": "都匀", "log": "107.53", "lat": "26.72" },
+                    { "name": "贵定", "log": "107.22", "lat": "26.58" },
+                    { "name": "瓮安", "log": "107.48", "lat": "27.08" },
+                    { "name": "平塘", "log": "107.55", "lat": "25.83" },
+                    { "name": "长顺", "log": "106.45", "lat": "26.03" },
+                    { "name": "惠水", "log": "106.66", "lat": "26.14" },
+                    { "name": "荔波", "log": "107.88", "lat": "25.42" },
+                    { "name": "福泉", "log": "107.51", "lat": "26.7" },
+                    { "name": "独山", "log": "107.54", "lat": "25.84" },
+                    { "name": "罗甸", "log": "106.74", "lat": "25.43" },
+                    { "name": "龙里", "log": "106.98", "lat": "26.46" },
+                    { "name": "三都", "log": "107.86", "lat": "26" }
+                ],
+                geoCoordMap: new Object(),
+                data: new Array()
+            }
+        },
+        methods: {
+            chartsInit() {
+                let theChart = echarts.init(document.getElementById('chartOne'));
+
+                //https://geo.datav.aliyun.com/areas_v2/bound/520000.json
+                var uploadedDataURL = "/public/GZ.geoJson";
+                theChart.showLoading();
+                $.getJSON(uploadedDataURL, function (geoJson) {
+                    echarts.registerMap('guizhou', geoJson);
+                    theChart.hideLoading();
+
+                    var geoCoordMap = {
+                        '贵阳': [106.71, 26.87],
+                        '六盘水': [104.92, 26.28],
+                        '遵义': [106.99, 27.99],
+                        '安顺': [105.92, 25.95],
+                        '毕节': [105.69, 27.12],
+                        '铜仁': [108.41, 27.73]
+                    }
+
+                    //geoCoordMap = this.geoCoordMap
+                    //console.log(geoCoordMap)
+                    var data = [
+                        {
+                            name: '贵阳',
+                            value: 190
+                        }, {
+                            name: '六盘水',
+                            value: 200
+                        }, {
+                            name: '遵义',
+                            value: 90
+                        }, {
+                            name: '安顺',
+                            value: 120
+                        }, {
+                            name: '毕节',
+                            value: 190
+                        }, {
+                            name: '铜仁',
+                            value: 170
+                        }
+                    ];
+
+                    //data = this.data
+                    //console.log(data)
+                    var convertData = function (data) {
+                        var res = [];
+                        for (var i = 0; i < data.length; i++) {
+                            var geoCoord = geoCoordMap[data[i].name];
+                            if (geoCoord) {
+                                res.push({
+                                    name: data[i].name,
+                                    value: geoCoord.concat(data[i].value)
+                                });
+                            }
+                        }
+                        return res;
+                    };
+
+                    option = {
+                        backgroundColor: '#0d0d0d',
+                        title: {
+                            top: 20,
+                            text: '设备分布图',
+                            subtext: '', //二级标题
+                            x: 'center', //横坐标居中
+                            textStyle: {
+                                color: '#ccc' //字体颜色
+                            }
+                        },
+
+                        // 鼠标移入时效果
+                        //tooltip: { //提示框组件
+                        //    trigger: 'item', //触发类型：数据项图形触发
+                        //    formatter: function (params) {
+                        //        if (typeof (params.value)[2] == "undefined") {
+                        //            return params.name + ' : ' + params.value;
+                        //        } else {
+                        //            return params.name + ' : ' + params.value[2];
+                        //        }
+                        //    }
+                        //}, //提示框浮层内容格式器
+
+                        visualMap: { //视觉映射组件
+                            show: false, //否显示 visualMap-continuous 组件。如果设置为 false，不会显示，但是数据映射的功能还存在
+                            max: 500, //指定 visualMapContinuous 组件的允许的最大值
+                            seriesIndex: [1], //指定取哪个系列的数据，即哪个系列的 series.data,默认取所有系列
+                            inRange: { //定义 在选中范围中 的视觉元素
+                                color: ['#0b0f20'] // 蓝绿
+                            }
+                        },
+                        geo: {
+                            show: true, //是否显示
+                            map: 'guizhou', //地图类型
+                            label: { //图形上的文本标签，说明图形的数据信息，比如值，名称
+                                normal: {
+                                    show: false, //是否在普通状态下显示标签
+                                },
+                                emphasis: {
+                                    show: false, //是否在高亮状态下显示标签
+                                }
+                            },
+                            roam: false, //是否开启鼠标缩放和平移漫游
+                            itemStyle: {
+                                normal: {
+                                    areaColor: 'transparent', //地图颜色，透明
+                                    borderColor: '#157be1', //地图边框颜色
+                                    borderWidth: 1, //边框宽度
+                                    // shadowColor: 'rgba(63, 218, 255, 0.5)', //阴影
+                                    // shadowOffsetX: -1,
+                                    // shadowOffsetY: 1,
+                                },
+                                emphasis: {
+                                    areaColor: '#3fdaff', //hover高亮时的颜色
+                                }
+                            }
+
+                        },
+                        series: [
+                            {
+                                name: 'light',
+                                type: 'scatter', //散点气泡图
+                                coordinateSystem: 'geo', //系列使用的坐标系：地理坐标系
+                                symbol: 'circle',
+                                data: convertData(data), //数据内容数组
+                                symbolSize: function (val) {
+                                    var num = val[2] / 6; //标记大小
+                                    if (num < 20) {
+                                        return 20
+                                    } else {
+                                        return num
+                                    }
+                                },
+                                label: {
+                                    normal: {
+                                        show: true,
+                                        formatter: function (value) {
+                                            return value.value[2]
+                                        },
+                                        textStyle: {
+                                            color: '#fff',
+                                            fontSize: 10,
+                                        }
+                                    },
+                                    emphasis: {
+                                        show: true //高亮的图片样式
+                                    }
+                                },
+                                itemStyle: {
+                                    normal: {
+                                        //修改圆圈颜色
+                                        color: {
+                                            type: 'radial',
+                                            x: 0.5,
+                                            y: 0.5,
+                                            r: 0.5,
+                                            colorStops: [{
+                                                offset: 0,
+                                                color: 'rgba(5,80,151,0.2)'
+                                            }, {
+                                                offset: 0.8,
+                                                color: 'rgba(5,80,151,0.8)'
+                                            }, {
+                                                offset: 1,
+                                                color: 'rgba(0,108,255,0.7)'
+                                            }],
+                                            global: false // 缺省为 false
+                                        },
+                                    }
+                                },
+                                zlevel: 6,
+                            }, {
+                                type: 'map',
+                                map: 'guizhou',
+                                zoom: 1.14,
+                                geoIndex: 0,
+                                aspectScale: 0.75, //长宽比
+                                showLegendSymbol: false, // 存在legend时显示
+                                label: {
+                                    normal: {
+                                        show: true,
+                                        textStyle: {
+                                            color: '#fff',
+                                            fontSize: 10
+                                        },
+                                    },
+                                    emphasis: {
+                                        show: true,
+                                        textStyle: {
+                                            color: '#fff'
+                                        }
+                                    }
+                                },
+                                roam: true,
+                                itemStyle: {
+                                    normal: {
+                                        areaColor: {
+                                            x: 0,
+                                            y: 0,
+                                            x2: 0,
+                                            y2: 1,
+                                            colorStops: [{
+                                                offset: 0,
+                                                color: '#073684' // 0% 处的颜色
+                                            }, {
+                                                offset: 1,
+                                                color: '#061E3D' // 100% 处的颜色
+                                            }],
+                                        },
+                                        borderColor: '#215495',
+                                        borderWidth: 1,
+                                    },
+                                    emphasis: {
+                                        areaColor: {
+                                            x: 0,
+                                            y: 0,
+                                            x2: 0,
+                                            y2: 1,
+                                            colorStops: [{
+                                                offset: 0,
+                                                color: '#073684' // 0% 处的颜色
+                                            }, {
+                                                offset: 1,
+                                                color: '#061E3D' // 100% 处的颜色
+                                            }],
+                                        },
+                                    }
+                                },
+                                animation: true,
+                                data: data
+                            },
+                            {
+                                name: 'Top 5',
+                                type: 'effectScatter',
+                                coordinateSystem: 'geo',
+                                data: convertData(data),
+                                symbolSize: function (val) {
+                                    return val[2] / 6;
+                                }, //基点
+                                showEffectOn: 'render',
+                                rippleEffect: {
+                                    brushType: 'stroke'
+                                },
+                                hoverAnimation: true,
+                                label: {
+                                    normal: {
+                                        formatter: '{b}',
+                                        position: 'right',
+                                        show: true
+                                    }
+                                },
+                                itemStyle: {
+                                    normal: {
+                                        //修改圆圈的颜色
+                                        color: {
+                                            type: 'radial',
+                                            x: 0.5,
+                                            y: 0.5,
+                                            r: 0.5,
+                                            colorStops: [{
+                                                offset: 0,
+                                                color: 'rgba(5,80,151,0.2)'
+                                            }, {
+                                                offset: 0.8,
+                                                color: 'rgba(5,80,151,0.8)'
+                                            }, {
+                                                offset: 1,
+                                                color: 'rgba(0,108,255,0.7)'
+                                            }],
+                                            global: false // 缺省为 false
+                                        },
+                                        shadowBlur: 2,
+                                        shadowColor: '#05C3F9'
+                                    }
+                                },
+                                zlevel: 1
+                            },
+
+                        ]
+                    };
+                    theChart.setOption(option);
+                });
+            },
+            TconvertData() {
+                this.geoInfo.forEach(item => {
+                    this.data.push({ name: item.name, value: 10 })
+                    this.geoCoordMap[item.name] = [item.log, item.lat]
+                })
+            }
+        },
+        mounted() {
+            //this.TconvertData()
+            this.chartsInit()
+        },
+    })
+</script>
+
+</html>
